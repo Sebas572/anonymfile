@@ -1,0 +1,16 @@
+{
+  "name": "anonymfile",
+  "version": "1.0.4",
+  "main": "index.js",
+  "type": "module",
+  "description": "Connect to Anonym File in a very simple way, to be able to upload your files quickly and efficiently. Node.js",
+  "repository": "Sebas572/anonymfile",
+  "author": "Sebastian Balebona",
+  "license": "MIT",
+  "keywords": [
+    "keyword"
+  ],
+  "dependencies": {
+    "axios": "^0.27.2"
+  }
+}
