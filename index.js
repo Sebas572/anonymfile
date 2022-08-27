@@ -62,6 +62,7 @@ const multiple_uploads = (directory, compress) => {
 const AnonymousFiles = async({directory, compress={active: false, name: 'Archive', type: 'tar'}}) => {
 	const dir_tmp = path.join(__dirname, '.tmp');
 	if(!fs.existsSync(dir_tmp))fs.mkdirSync(dir_tmp);
+	
 	if(directory === undefined) return {Error: 'You must pass the directory of the file'}
 
 	if(compress.active === undefined) compress.active = false;
