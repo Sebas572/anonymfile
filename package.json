@@ -1,6 +1,6 @@
 {
   "name": "anonymfile",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "main": "index.js",
   "description": "Connect to Anonym File in a very simple way, to be able to upload your files quickly and efficiently. Node.js",
   "repository": "Sebas572/anonymfile",
