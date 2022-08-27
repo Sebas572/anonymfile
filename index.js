@@ -4,6 +4,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('node:fs');
 const compressFiles = require('./CompressFiles.js');
+const path = require('path');
 
 const url = 'https://anonymfile.com/api/v1/upload';
 
@@ -59,6 +60,8 @@ const multiple_uploads = (directory, compress) => {
 
 //you must send the directory of the file to the "AnonymousFiles" function
 const AnonymousFiles = async({directory, compress={active: false, name: 'Archive', type: 'tar'}}) => {
+	const dir_tmp = path.join(__dirname, '.tmp');
+	if(!fs.existsSync(dir_tmp))fs.mkdirSync(dir_tmp);
 	if(directory === undefined) return {Error: 'You must pass the directory of the file'}
 
 	if(compress.active === undefined) compress.active = false;
