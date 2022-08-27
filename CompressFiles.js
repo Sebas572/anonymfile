@@ -1,7 +1,6 @@
 "use strict";
 
 const fs = require('node:fs');
-const tar = require('tar');
 const archiver = require('archiver');
 const path = require('path');
 
