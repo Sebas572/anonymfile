@@ -9,7 +9,7 @@ const formats = {
 	tar: 'tar.gz'
 }
 
-const CompressFiles = ({directory, compress}) => {
+const start_compression = ({directory, compress}) => {
 	return new Promise((resolve, reject) => {
 		directory.forEach((dir) => {
 			if(!fs.existsSync(dir)) {
@@ -21,7 +21,7 @@ const CompressFiles = ({directory, compress}) => {
 		})
 
 		const type = formats[compress.type];
-		const fileName = path.join(__dirname, '.tmp', `${compress.name}.${type}`);
+		const fileName = path.join(__dirname, '..', '.tmp', `${compress.name}.${type}`);
 		const output = fs.createWriteStream(fileName);
 		const archive = archiver(compress.type, {zlib: { level: 9 }});
 
@@ -59,16 +59,16 @@ const CompressFiles = ({directory, compress}) => {
 	})
 }
 
-const startCompression = async({directory, compress}) => {
+const manage_compression = async({directory, compress}) => {
 	try {
-		const data = await CompressFiles({directory: directory, compress: compress});
+		const data = await start_compression({directory: directory, compress: compress});
 		return data;
 	}catch (err) {
 		return err;
 	};	
 }
 
-const compressFiles = async({directory, compress}) => {
+const compress = async({directory, compress}) => {
 	if(compress.active === undefined) return directory;
 	if(typeof compress.active !== 'boolean') return {Error: 'The variable \"compress.active\" must be of type \"Boolean\"'};
 	if(typeof compress.name !== 'string') return {Error: 'The variable \"compress.name\" must be of type \"String\"'};
@@ -81,9 +81,9 @@ const compressFiles = async({directory, compress}) => {
 	compress.type = compress.type.toLowerCase();
 
 	if(compress.type === 'tar') {
-		return await startCompression({directory: directory, compress: compress});
+		return await manage_compression({directory: directory, compress: compress});
 	}else if(compress.type === 'zip') {
-		return  await startCompression({directory: directory, compress: compress});
+		return  await manage_compression({directory: directory, compress: compress});
 	}else {
 		const message = 'Accepted compression format types are \"tar.gz\" and \"zip\"';
 		console.error(message);
@@ -91,4 +91,4 @@ const compressFiles = async({directory, compress}) => {
 	}
 }
 
-module.exports = compressFiles;
+module.exports = compress;

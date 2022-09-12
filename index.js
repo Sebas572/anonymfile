@@ -1,65 +1,13 @@
 "use strict";
 
-const axios = require('axios');
-const FormData = require('form-data');
-const fs = require('node:fs');
-const compressFiles = require('./CompressFiles.js');
+const fs = require('node:fs')
 const path = require('path');
-
-const url = 'https://anonymfile.com/api/v1/upload';
-
-const upload = async(directory, compress) => {
-	return new Promise(async(resolve, reject) => {
-		const form = new FormData();
-		
-		if(!fs.existsSync(directory)) {
-			reject({Error: `This file does not exist \"${directory}\"`});
-		}else {
-			form.append('file', fs.createReadStream(directory));
-
-			const response = await axios.post(url, form, {
-				'maxContentLength': Infinity,
-				'maxBodyLength': Infinity
-			}).catch(err => {
-				reject({Error: 'An error occurred while trying to connect'});
-			}).finally(() => {
-				//remove compression that was previously saved
-				if(compress.active) {
-					fs.rm(directory, (err) => {
-						if(err) console.log('Error in remove file .tmp');
-					});
-				}
-			});
-
-			const Json = response.data;
-			Json['url'] = Json.data.file.url.full;
-			
-			resolve(Json);
-		}
-	});
-}
-
-const multiple_uploads = (directory, compress) => {
-	const Json = [];
-
-	return new Promise((resolve, reject) => {
-		directory.forEach(async(element, index) => {
-			try {
-				const get = await upload(element, compress);
-				Json.push(get);
-			
-			}catch (err) {
-				Json.push(err);
-			}
-			
-			if(Json.length === directory.length) resolve(Json);
-		});
-
-	});
-}
+const upload = require('./src/upload.js');
+const multiple_uploads = require('./src/multiple_uploads.js');
+const compress_files = require('./src/compress_files.js');
 
 //you must send the directory of the file to the "AnonymousFiles" function
-const AnonymousFiles = async({directory, compress={active: false, name: 'Archive', type: 'tar'}}) => {
+const AnonymousFiles = async({directory, compress={active: false, name: 'Archive', type: 'tar'}, progress}) => {
 	const dir_tmp = path.join(__dirname, '.tmp');
 	if(!fs.existsSync(dir_tmp))fs.mkdirSync(dir_tmp);
 	
@@ -69,18 +17,18 @@ const AnonymousFiles = async({directory, compress={active: false, name: 'Archive
 	if(compress.name === undefined) compress.name = 'Archive';
 	if(compress.type === undefined) compress.type = 'tar';
 	
-	directory = await compressFiles({directory, compress});
+	directory = await compress_files({directory, compress});
 	if(directory.Error !== undefined) return directory;
 
 	if(!Array.isArray(directory)) {
 		try {
-			const data = await upload(directory, compress);
+			const data = await upload(directory, compress, progress);
 			return data;
 		}catch(err) {
 			return err;
 		}
 	}
-	else return await multiple_uploads(directory, compress);
+	else return await multiple_uploads(directory, compress, progress);
 
 }
 

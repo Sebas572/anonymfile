@@ -21,7 +21,7 @@ const dir = './HelloWorld.txt';
 import AnonymousFiles from 'anonymfile';
 
 (async() => {
-	const result = await anonymfile({
+	const result = await AnonymousFiles({
 		directory: ['./Hello.txt', './World.md']
 	});
 
@@ -29,13 +29,31 @@ import AnonymousFiles from 'anonymfile';
 })();
 ```
 
+### Also you can see the progress using a callback
+
+```js
+import AnonymousFiles from 'anonymfile';
+
+(async() => {
+	const result = await anonymfile({
+		directory: './Hello.txt',
+		
+		progress: (progress) => {
+			console.log(progress);
+		}
+	});
+
+	console.log(result);
+})();
+````
+
 #### However, you also want to compress the files just indicate it, as you will see below
 
 ```javascript
 import AnonymousFiles from 'anonymfile';
 
 (async() => {
-	const result = await anonymfile({
+	const result = await AnonymousFiles({
 		directory: ['./Hello.txt', './World.md'],
 		compress: {
 			active: true,
