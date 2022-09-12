@@ -14,6 +14,16 @@ const url = {
 };
 
 const upload = async(directory, compress, progress) => {
+	const remove_compress = () => {
+  	//remove compression that was previously saved
+		if(compress.active) {
+			fs.rm(directory, (err) => {
+				if(err) console.log('Error in remove file .tmp');
+			});
+		}
+	}
+
+
 	return new Promise(async(resolve, reject) => {
 		const form = new FormData();
 		
@@ -38,19 +48,16 @@ const upload = async(directory, compress, progress) => {
 				'maxBodyLength': Infinity,
 			}
 
-
 			const callback = (response) => {
 				let get_data = '';
 			  
-			  response.on('error', (err) => {
-			  	reject({Error: `An error occurred while sending the file\n${err}`});
-			  })
-
 			  response.on('data', (chunk) => {
 			  	get_data += chunk;
 			  });
 
 			  response.on('end', () => {
+			  	remove_compress();
+
 					const Json = JSON.parse(get_data);
 					Json['url'] = Json.data.file.url.full;
 					
@@ -60,6 +67,11 @@ const upload = async(directory, compress, progress) => {
 
 			const request = https.request(config, callback);
 			form.pipe(request);
+
+		  request.on('error', (err) => {
+		  	remove_compress();
+		  	reject({Error: `An error occurred while sending the file ${path.basename(directory)} \n${err}`});
+		  })
 		}
 	});
 }
